@@ -1,6 +1,9 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
 class Perceptron:
     def __init__(self, theta, feature_count, epoch):
-        self.weights = [0 for i in range feature_count]
+        self.weights = [0 for i in range(feature_count)]
         self.theta = theta
         self.epoch = epoch
 
@@ -18,3 +21,4 @@ class Perceptron:
         for feature, weight in zip(x, self.weights):
             net_input += feature*weight
         return 1 if net_input > 0 else 0
+
