@@ -5,6 +5,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import StratifiedKFold
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.preprocessing import StandardScaler
 
 def dec_tree(X, y, cv):
     tree_acc = 0
@@ -41,6 +42,28 @@ def log_reg(X, y, cv):
     print(f'{log_acc=}')
 
 
+def std_log_reg(X, y, cv):
+    std_log_acc = 0
+    for train_idx, valid_idx in cv.split(X, y):
+        scaler = StandardScaler()
+        scaler.fit(X[train_idx])
+        X_train_std = scaler.transform(X[train_idx])
+        X_valid_std = scaler.transform(X[valid_idx])
+        print('----')
+        print(X)
+        print('----')
+        print('----')
+        print(X_train_std)
+        print('----')
+        log = LogisticRegression(random_state=1)
+        log.fit(X_train_std, y[train_idx])
+        y_pred = log.predict(X_valid_std)
+        std_log_acc += np.mean(y_pred == y[valid_idx])*100
+
+    std_log_acc /= 10
+    print(f'{std_log_acc=}')
+
+
 def main(args):
     df = pd.read_csv(args.input)
     df["result"] = df["result"].map({"win":1, "lose":0})
@@ -56,6 +79,7 @@ def main(args):
 
     log_reg(X, y, cv)
 
+    std_log_reg(X, y, cv)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
