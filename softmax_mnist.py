@@ -63,8 +63,7 @@ for epoch in range(epochs):
 
         optimizer.step()
         """
-        preds = torch.FloatTensor([torch.argmax(p) for p in probs])
-        acc = torch.sum(preds == targets.view(-1)) / targets.size(0)
+        acc = torch.sum(torch.argmax(probs, dim=1) == targets.view(-1)) / targets.size(0)
         print(f'{acc=}')
         """
 
@@ -72,6 +71,5 @@ for features, targets in test_loader:
     features = features.view(-1, 28*28).to(device)
     targets = targets.to(device)
     _, probs = model(features)
-    preds = torch.FloatTensor([torch.argmax(p) for p in probs])
-    acc = torch.sum(preds == targets.view(-1)) / targets.size(0)
+    acc = torch.sum(torch.argmax(probs, dim=1) == targets.view(-1)) / targets.size(0)
     print(f'{acc=}')
