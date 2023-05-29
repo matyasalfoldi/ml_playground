@@ -58,7 +58,8 @@ class MultilayerPeceptron2(torch.nn.Module):
         self.network = torch.nn.Sequential(
             torch.nn.Flatten(),
             # Hidden Layer
-            torch.nn.Linear(num_features, num_hidden),
+            torch.nn.Linear(num_features, num_hidden, bias=False),
+            torch.nn.BatchNorm1d(num_hidden),
             torch.nn.ReLU(),
             torch.nn.Dropout(drop_prob),
             # Output layer
@@ -97,7 +98,10 @@ def train(flatten=True):
 
 def eval(flatten=True):
     model.eval()
+    acc = 0
+    count = 0
     for features, targets in test_loader:
+        count += 1
         if flatten:
             features = features.view(-1, 28*28).to(DEVICE)
         else:
@@ -108,8 +112,9 @@ def eval(flatten=True):
         else:
             logits = model(features)
             probs = torch.softmax(logits, dim=1)
-        acc = torch.sum(torch.argmax(probs, dim=1) == targets.view(-1)) / targets.size(0)
-        print(f'{acc=}')
+        acc += torch.sum(torch.argmax(probs, dim=1) == targets.view(-1)) / targets.size(0)
+    acc /= count
+    print(f'{acc=}')
 
 torch.manual_seed(RANDOM_SEED)
 #model = MultilayerPeceptron(
