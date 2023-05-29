@@ -52,36 +52,79 @@ class MultilayerPeceptron(torch.nn.Module):
         probs = torch.softmax(logits, dim=1)
         return logits, probs
 
+class MultilayerPeceptron2(torch.nn.Module):
+    def __init__(self, num_features, num_hidden, num_classes, drop_prob):
+        super().__init__()
+        self.network = torch.nn.Sequential(
+            torch.nn.Flatten(),
+            # Hidden Layer
+            torch.nn.Linear(num_features, num_hidden),
+            torch.nn.ReLU(),
+            torch.nn.Dropout(drop_prob),
+            # Output layer
+            torch.nn.Linear(num_hidden, num_classes),
+            torch.nn.Softmax(dim=1)
+        )
+    
+    def forward(self, x):
+        logits = self.network(x)
+        return logits
+
+
+def train(flatten=True):
+    for epoch in range(NUM_EPOCHS):
+        model.train()
+        for features, targets in train_loader:
+            if flatten:
+                features = features.view(-1, 28*28).to(DEVICE)
+            else:
+                features = features.to(DEVICE)
+            targets = targets.to(DEVICE)
+            # Call checks and forward
+            if flatten:
+                logits, probs = model(features)
+            else:
+                logits = model(features)
+            # Calculate Loss
+            cost = F.cross_entropy(logits, targets)
+            # Reset gradients
+            optimizer.zero_grad()
+            # Calculate gradient
+            cost.backward()
+            # Update weights
+            optimizer.step()
+
+
+def eval(flatten=True):
+    model.eval()
+    for features, targets in test_loader:
+        if flatten:
+            features = features.view(-1, 28*28).to(DEVICE)
+        else:
+            features = features.to(DEVICE)
+        targets = targets.to(DEVICE)
+        if flatten:
+            _, probs = model(features)
+        else:
+            logits = model(features)
+            probs = logits
+        acc = torch.sum(torch.argmax(probs, dim=1) == targets.view(-1)) / targets.size(0)
+        print(f'{acc=}')
+
 torch.manual_seed(RANDOM_SEED)
-model = MultilayerPeceptron(
+#model = MultilayerPeceptron(
+#    num_features=28*28,
+#    num_hidden=100,
+#    num_classes=10
+#)
+model = MultilayerPeceptron2(
     num_features=28*28,
     num_hidden=100,
-    num_classes=10
+    num_classes=10,
+    drop_prob=0.5
 )
 
 model = model.to(DEVICE)
 optimizer = torch.optim.SGD(model.parameters(), lr=0.1)
-
-for epoch in range(NUM_EPOCHS):
-    model.train()
-    for features, targets in train_loader:
-        features = features.view(-1, 28*28).to(DEVICE)
-        targets = targets.to(DEVICE)
-        # Call checks and forward
-        logits, probs = model(features)
-        # Calculate Loss
-        cost = F.cross_entropy(logits, targets)
-        # Reset gradients
-        optimizer.zero_grad()
-        # Calculate gradient
-        cost.backward()
-        # Update weights
-        optimizer.step()
-
-
-for features, targets in test_loader:
-    features = features.view(-1, 28*28).to(DEVICE)
-    targets = targets.to(DEVICE)
-    _, probs = model(features)
-    acc = torch.sum(torch.argmax(probs, dim=1) == targets.view(-1)) / targets.size(0)
-    print(f'{acc=}')
+train(False)
+eval(False)
