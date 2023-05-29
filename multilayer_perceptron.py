@@ -62,8 +62,7 @@ class MultilayerPeceptron2(torch.nn.Module):
             torch.nn.ReLU(),
             torch.nn.Dropout(drop_prob),
             # Output layer
-            torch.nn.Linear(num_hidden, num_classes),
-            torch.nn.Softmax(dim=1)
+            torch.nn.Linear(num_hidden, num_classes)
         )
     
     def forward(self, x):
@@ -85,6 +84,7 @@ def train(flatten=True):
                 logits, probs = model(features)
             else:
                 logits = model(features)
+                probs = torch.softmax(logits, dim=1)
             # Calculate Loss
             cost = F.cross_entropy(logits, targets)
             # Reset gradients
@@ -107,7 +107,7 @@ def eval(flatten=True):
             _, probs = model(features)
         else:
             logits = model(features)
-            probs = logits
+            probs = torch.softmax(logits, dim=1)
         acc = torch.sum(torch.argmax(probs, dim=1) == targets.view(-1)) / targets.size(0)
         print(f'{acc=}')
 
