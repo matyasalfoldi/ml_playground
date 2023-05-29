@@ -123,5 +123,17 @@ torch.manual_seed(RANDOM_SEED)
 model = LeNet5(10, True)
 optimizer = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
 model.to(DEVICE)
-train()
+import os
+model_path = 'save/model.pt'
+optimizer_path = 'save/optimizer.pt'
+if os.path.exists(model_path):
+    print('Loading model/optimizer')
+    model.load_state_dict(torch.load(model_path))
+    optimizer.load_state_dict(torch.load(optimizer_path))
+else:
+    print('Training')
+    train()
+    torch.save(model.state_dict(), model_path)
+    torch.save(optimizer.state_dict(), optimizer_path)
 evaluate()
+
