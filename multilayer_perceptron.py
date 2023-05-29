@@ -6,8 +6,8 @@ import torch.nn.functional as F
 import torch
 
 RANDOM_SEED = 1
-BATCH_SIZE = 100
-NUM_EPOCHS = 10
+BATCH_SIZE = 256
+NUM_EPOCHS = 50
 DEVICE = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 train_dataset = datasets.MNIST(
@@ -24,15 +24,17 @@ test_dataset = datasets.MNIST(
 )
 
 train_loader = DataLoader(
-    dataset=train_dataset, 
-    batch_size=BATCH_SIZE, 
-    shuffle=True
+    dataset=train_dataset,
+    batch_size=BATCH_SIZE,
+    shuffle=True,
+    drop_last=True
 )
 
 test_loader = DataLoader(
-    dataset=test_dataset, 
-    batch_size=BATCH_SIZE, 
-    shuffle=False
+    dataset=test_dataset,
+    batch_size=BATCH_SIZE,
+    shuffle=False,
+    drop_last=True
 )
 
 class MultilayerPeceptron(torch.nn.Module):
