@@ -135,3 +135,18 @@ model = model.to(DEVICE)
 optimizer = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
 train(False)
 eval(False)
+
+"""
+#Model save/load
+model.to(torch.device('cpu'))
+torch.save(model.state_dict(), './model.pt')
+torch.save(optimizer.state_dict(), './optimizer.pt')
+#scheduler-s also need to be saved if there are any
+#Loading
+model = ...
+model.load_state_dict(torch.load('./model.pt'))
+model = model.to(DEVICE)
+optimizer = ...
+optimizer.load_state_dict(torch.load('./optimizer.pt'))
+# same for scheduler if there is one
+"""
