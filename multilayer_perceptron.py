@@ -59,7 +59,7 @@ class MultilayerPeceptron2(torch.nn.Module):
             torch.nn.Flatten(),
             # Hidden Layer
             torch.nn.Linear(num_features, num_hidden, bias=False),
-            torch.nn.ReLU(),
+            torch.nn.LeakyReLU(),
             torch.nn.BatchNorm1d(num_hidden),
             torch.nn.Dropout(drop_prob),
             # Output layer
