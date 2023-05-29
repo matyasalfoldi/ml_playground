@@ -130,6 +130,6 @@ model = MultilayerPeceptron2(
 )
 
 model = model.to(DEVICE)
-optimizer = torch.optim.SGD(model.parameters(), lr=0.1)
+optimizer = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
 train(False)
 eval(False)
