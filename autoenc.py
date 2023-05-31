@@ -7,6 +7,13 @@ import torch.nn.functional as F
 import torch
 from torch import nn
 
+class Crop(nn.Module):
+    def __init__(self):
+        super().__init__()
+
+    def forward(self, x):
+        crop = transforms.CenterCrop((28, 28))
+        return crop(x)
 
 class AutoEncoder(torch.nn.Module):
     def __init__(self):
@@ -32,7 +39,8 @@ class AutoEncoder(torch.nn.Module):
             nn.LeakyReLU(),
             nn.ConvTranspose2d(64, 32, stride=2, kernel_size=3, padding=0),                
             nn.LeakyReLU(),
-            nn.ConvTranspose2d(32, 1, stride=1, kernel_size=2, padding=0),
+            nn.ConvTranspose2d(32, 1, stride=1, kernel_size=3, padding=0),
+            Crop(),
             nn.Sigmoid()
         )
 
@@ -79,11 +87,11 @@ def train():
             features = features.to(DEVICE)
             # Call checks and forward
             logits = model(features)
-            #if epoch == NUM_EPOCHS-1:
-            #    plt.imshow(features[0].reshape(28, 28), cmap='gray')
-            #    plt.show()
-            #    plt.imshow(logits[0].reshape(28, 28).detach().numpy(), cmap='gray')
-            #    plt.show()
+            if epoch == NUM_EPOCHS-1:
+                plt.imshow(features[0].reshape(28, 28), cmap='gray')
+                plt.show()
+                plt.imshow(logits[0].reshape(28, 28).detach().numpy(), cmap='gray')
+                plt.show()
             # Calculate Loss
             cost = F.mse_loss(logits, features)
             # Reset gradients
