@@ -46,6 +46,7 @@ test_loader = DataLoader(
     drop_last=True
 )
 
+
 class LeNet5(torch.nn.Module):
     def __init__(self, num_classes, black_and_white=False):
         super().__init__()
@@ -55,11 +56,14 @@ class LeNet5(torch.nn.Module):
             in_ch = 1
         else:
             in_ch = 3
+        # Calculating padding size for same sized input/output:
+        # p = (kernel_size-1)/2
         # output width = (input_width - kernel_width)/stride + 1
         # Here in Conv2d calls stride=1
         self.network = torch.nn.Sequential(
             # 32-5+1=28
             # 6 * 28*28 feature map
+            # we can do padding=2 for example to add padding
             torch.nn.Conv2d(in_ch, 6, kernel_size=5),
             # LeNet 5 uses Tanh activation function
             torch.nn.Tanh(),
