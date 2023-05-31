@@ -79,7 +79,7 @@ def train():
             features = features.to(DEVICE)
             # Call checks and forward
             logits = model(features)
-            #if epoch == 10:
+            #if epoch == NUM_EPOCHS-1:
             #    plt.imshow(features[0].reshape(28, 28), cmap='gray')
             #    plt.show()
             #    plt.imshow(logits[0].reshape(28, 28).detach().numpy(), cmap='gray')
