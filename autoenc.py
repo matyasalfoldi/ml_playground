@@ -12,6 +12,7 @@ class Crop(nn.Module):
         super().__init__()
 
     def forward(self, x):
+        # Should maybe use RandomCrop
         crop = transforms.CenterCrop((28, 28))
         return crop(x)
 
@@ -55,7 +56,7 @@ class AutoEncoder(torch.nn.Module):
 RANDOM_SEED = 1
 BATCH_SIZE = 256
 NUM_EPOCHS = 20
-LEARNING_RATE = 0.0001
+LEARNING_RATE = 0.0005
 DEVICE = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 torch.manual_seed(RANDOM_SEED)
 
@@ -78,28 +79,31 @@ model.to(DEVICE)
 
 optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 import matplotlib.pyplot as plt
-import matplotlib.colors as mcolors
 
 def train():
     for epoch in range(NUM_EPOCHS):
         model.train()
+        costs = 0
         for features, targets in train_loader:
             features = features.to(DEVICE)
             # Call checks and forward
             logits = model(features)
             if epoch == NUM_EPOCHS-1:
-                plt.imshow(features[0].reshape(28, 28), cmap='gray')
-                plt.show()
-                plt.imshow(logits[0].reshape(28, 28).detach().numpy(), cmap='gray')
-                plt.show()
+                for i in range(BATCH_SIZE):
+                    plt.imshow(features[i].reshape(28, 28), cmap='gray')
+                    plt.show()
+                    plt.imshow(logits[i].reshape(28, 28).detach().numpy(), cmap='gray')
+                    plt.show()
             # Calculate Loss
             cost = F.mse_loss(logits, features)
+            costs += cost
             # Reset gradients
             optimizer.zero_grad()
             # Calculate gradient
             cost.backward()
             # Update weights
             optimizer.step()
-            print(f'Cost/Loss: {cost}')
+        costs /= BATCH_SIZE
+        print(f'Cost/Loss: {costs}')
 train()
 
